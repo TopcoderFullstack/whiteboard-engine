@@ -21,6 +21,8 @@
 | 2 | `scripts/fork-release.sh` | 新增发布脚本 | 构建并更新 release 产物分支 | 无（新文件） |
 | 3 | `FORK.md` | 本手册 | — | 无（新文件） |
 | 4 | `.github/workflows/`（删除） | 移除上游 CI | fork 不运行上游发布自动化；且 OAuth token 无 workflow scope 无法推送 | 中：上游改 workflow 时产生 modify/delete 冲突，同步时一律保持删除 |
+| 5 | `css/theme.scss`（61 处）`components/TextField.scss`（3 处） | 主题合同：内部颜色变量包裹为 `var(--board-*, 原值)` | 宿主 token 驱动引擎全局风格，见 THEME-CONTRACT.md | 中：上游改 theme.scss 需按合同文档重对映射（保包裹模式、换回退值） |
+| 6 | `THEME-CONTRACT.md` | 合同文档 | — | 无（新文件） |
 
 ## 构建与发布 runbook
 

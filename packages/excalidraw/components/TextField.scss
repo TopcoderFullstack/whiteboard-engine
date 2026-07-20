@@ -6,10 +6,10 @@
   --ExcTextField--background: var(--color-surface-low);
   --ExcTextField--readonly--background: var(--color-surface-high);
   --ExcTextField--readonly--color: var(--color-on-surface);
-  --ExcTextField--border: var(--color-gray-20);
+  --ExcTextField--border: var(--board-border, var(--color-gray-20));
   --ExcTextField--readonly--border: var(--color-border-outline-variant);
-  --ExcTextField--border-hover: var(--color-brand-hover);
-  --ExcTextField--border-active: var(--color-brand-active);
+  --ExcTextField--border-hover: var(--board-ring, var(--color-brand-hover));
+  --ExcTextField--border-active: var(--board-ring, var(--color-brand-active));
   --ExcTextField--placeholder: var(--color-border-outline-variant);
 
   .ExcTextField {
