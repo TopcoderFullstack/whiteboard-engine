@@ -20,6 +20,7 @@
 | 1 | `.yarnrc` | `ignore-engines true` | 在 node 24 上构建（上游 engines 限 18–22） | 无（新文件） |
 | 2 | `scripts/fork-release.sh` | 新增发布脚本 | 构建并更新 release 产物分支 | 无（新文件） |
 | 3 | `FORK.md` | 本手册 | — | 无（新文件） |
+| 4 | `.github/workflows/`（删除） | 移除上游 CI | fork 不运行上游发布自动化；且 OAuth token 无 workflow scope 无法推送 | 中：上游改 workflow 时产生 modify/delete 冲突，同步时一律保持删除 |
 
 ## 构建与发布 runbook
 
