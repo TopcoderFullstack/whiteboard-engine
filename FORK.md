@@ -24,7 +24,8 @@
 | 5 | `css/theme.scss`（61 处）`components/TextField.scss`（3 处） | 主题合同：内部颜色变量包裹为 `var(--board-*, 原值)` | 宿主 token 驱动引擎全局风格，见 THEME-CONTRACT.md | 中：上游改 theme.scss 需按合同文档重对映射（保包裹模式、换回退值） |
 | 6 | `THEME-CONTRACT.md` | 合同文档 | — | 无（新文件） |
 | 7 | `components/icons.tsx`（23 个图标重绘） | 核心 chrome 图标替换为 lucide 几何（stroke 1.5，标 `FORK(board) lucide:` 注释） | 与宿主桌面 dock/菜单同一图标语言 | 中：上游改这些图标定义时冲突，保留 lucide 版并核对新增用途 |
-| 8 | `css/board-effects.scss` + `ToolIcon.scss`（1 行 import） | 图标互动特效（hover 弹性/按压/选中 tint 发光+弹跳，含 reduced-motion 降级） | 桌面级质感 | 低：新文件 + 单行 import |
+| 8 | `css/board-effects.scss` + `ToolIcon.scss`（1 行 import） | 图标互动特效（hover 弹性/按压/选中 tint 发光+弹跳，含 reduced-motion 降级；作用于菜单/撤销/缩放等按钮） | 桌面级质感 | 低：新文件 + 单行 import |
+| 9 | `css/board-effects.scss` | 废弃引擎形状工具栏（`.shapes-section` 隐藏）；撤销/重做移到右下 | 工具栏由宿主用 React Bits Dock 自绘（setActiveTool 驱动，见宿主 board-dock.tsx） | 低：纯 CSS，上游布局重构时复查 |
 
 ## 构建与发布 runbook
 

@@ -50,3 +50,19 @@
     transform: scale(1);
   }
 }
+
+// FORK(board): 引擎自带形状工具栏整体废弃 ——
+// 宿主用桌面同源的 React Bits Dock 自绘工具栏（setActiveTool 驱动）
+.excalidraw .shapes-section {
+  display: none;
+}
+
+// FORK(board): 撤销/重做移到右下（帮助按钮左侧），避免与底部 dock 工具栏碰撞
+.excalidraw {
+  .undo-redo-buttons {
+    position: absolute;
+    right: 3.25rem;
+    bottom: 0;
+    z-index: 4;
+  }
+}
