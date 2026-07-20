@@ -1,0 +1,52 @@
+// FORK(board): 图标互动特效
+// hover 弹性上浮、按压回缩、选中工具 tint 发光 + 弹跳入场。
+// 颜色一律走主题合同变量（--color-selection 已由 --board-selection 驱动）。
+
+.excalidraw {
+  .ToolIcon__icon svg {
+    transition:
+      transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1),
+      filter 0.2s ease;
+  }
+
+  .ToolIcon:hover .ToolIcon__icon svg {
+    transform: translateY(-1px) scale(1.15);
+  }
+
+  .ToolIcon:active .ToolIcon__icon svg {
+    transform: scale(0.88);
+    transition-duration: 0.07s;
+  }
+
+  .ToolIcon_type_radio:checked + .ToolIcon__icon svg,
+  .ToolIcon__icon.ToolIcon--selected svg {
+    filter: drop-shadow(
+      0 0 5px color-mix(in oklab, var(--color-selection) 70%, transparent)
+    );
+    animation: board-icon-pop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ToolIcon__icon svg,
+    .ToolIcon:hover .ToolIcon__icon svg,
+    .ToolIcon:active .ToolIcon__icon svg,
+    .ToolIcon_type_radio:checked + .ToolIcon__icon svg,
+    .ToolIcon__icon.ToolIcon--selected svg {
+      transition: none;
+      transform: none;
+      animation: none;
+    }
+  }
+}
+
+@keyframes board-icon-pop {
+  0% {
+    transform: scale(0.7);
+  }
+  55% {
+    transform: scale(1.22);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

@@ -84,14 +84,11 @@ export const PlusPromoIcon = createIcon(
 );
 
 // tabler-icons: book
+// FORK(board) lucide: book-open
 export const LibraryIcon = createIcon(
-  <g strokeWidth="1.25">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
-    <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
-    <line x1="3" y1="6" x2="3" y2="19" />
-    <line x1="12" y1="6" x2="12" y2="19" />
-    <line x1="21" y1="6" x2="21" y2="19" />
+  <g strokeWidth="1.5">
+    <path d="M12 7v14" />
+    <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
   </g>,
   tablerIconProps,
 );
@@ -129,52 +126,23 @@ export const PinIcon = createIcon(
 );
 
 // tabler-icons: lock-open (via Figma)
+// FORK(board) lucide: lock-open
 export const UnlockedIcon = createIcon(
-  <g>
-    <path
-      d="M13.542 8.542H6.458a2.5 2.5 0 0 0-2.5 2.5v3.75a2.5 2.5 0 0 0 2.5 2.5h7.084a2.5 2.5 0 0 0 2.5-2.5v-3.75a2.5 2.5 0 0 0-2.5-2.5Z"
-      stroke="currentColor"
-      strokeWidth="1.25"
-    />
-    <path
-      d="M10 13.958a1.042 1.042 0 1 0 0-2.083 1.042 1.042 0 0 0 0 2.083Z"
-      stroke="currentColor"
-      strokeWidth="1.25"
-    />
-    <mask
-      id="UnlockedIcon"
-      style={{ maskType: "alpha" }}
-      maskUnits="userSpaceOnUse"
-      x={6}
-      y={1}
-      width={9}
-      height={9}
-    >
-      <path
-        stroke="none"
-        d="M6.399 9.561V5.175c0-.93.401-1.823 1.116-2.48a3.981 3.981 0 0 1 2.693-1.028c1.01 0 1.98.37 2.694 1.027.715.658 1.116 1.55 1.116 2.481"
-        fill="#fff"
-      />
-    </mask>
-    <g mask="url(#UnlockedIcon)">
-      <path
-        stroke="none"
-        d="M5.149 9.561v1.25h2.5v-1.25h-2.5Zm5.06-7.894V.417v1.25Zm2.559 3.508v1.25h2.5v-1.25h-2.5ZM7.648 8.51V5.175h-2.5V8.51h2.5Zm0-3.334c0-.564.243-1.128.713-1.561L6.668 1.775c-.959.883-1.52 2.104-1.52 3.4h2.5Zm.713-1.561a2.732 2.732 0 0 1 1.847-.697v-2.5c-1.31 0-2.585.478-3.54 1.358L8.36 3.614Zm1.847-.697c.71 0 1.374.26 1.847.697l1.694-1.839a5.231 5.231 0 0 0-3.54-1.358v2.5Zm1.847.697c.47.433.713.997.713 1.561h2.5c0-1.296-.56-2.517-1.52-3.4l-1.693 1.839Z"
-        fill="currentColor"
-      />
-    </g>
+  <g strokeWidth="1.5">
+    <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+    <path d="M7 11V7a5 5 0 0 1 9.9-1" />
   </g>,
-  modifiedTablerIconProps,
+  tablerIconProps,
 );
 
 // tabler-icons: lock (via Figma)
+// FORK(board) lucide: lock
 export const LockedIcon = createIcon(
-  <g strokeWidth="1.25">
-    <path d="M13.542 8.542H6.458a2.5 2.5 0 0 0-2.5 2.5v3.75a2.5 2.5 0 0 0 2.5 2.5h7.084a2.5 2.5 0 0 0 2.5-2.5v-3.75a2.5 2.5 0 0 0-2.5-2.5Z" />
-    <path d="M10 13.958a1.042 1.042 0 1 0 0-2.083 1.042 1.042 0 0 0 0 2.083Z" />
-    <path d="M6.667 8.333V5.417C6.667 3.806 8.159 2.5 10 2.5c1.841 0 3.333 1.306 3.333 2.917v2.916" />
+  <g strokeWidth="1.5">
+    <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
   </g>,
-  modifiedTablerIconProps,
+  tablerIconProps,
 );
 
 // custom
@@ -264,59 +232,58 @@ export const ExcalLogo = createIcon(
 );
 
 // custom
+// FORK(board) lucide: mouse-pointer-2
 export const SelectionIcon = createIcon(
-  <g stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M6 6l4.153 11.793a0.365 .365 0 0 0 .331 .207a0.366 .366 0 0 0 .332 -.207l2.184 -4.793l4.787 -1.994a0.355 .355 0 0 0 .213 -.323a0.355 .355 0 0 0 -.213 -.323l-11.787 -4.36z" />
-    <path d="M13.5 13.5l4.5 4.5" />
+  <g strokeWidth="1.5">
+    <path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z" />
   </g>,
-  { fill: "none", width: 22, height: 22, strokeWidth: 1.25 },
+  tablerIconProps,
 );
 
 // tabler-icons: square
+// FORK(board) lucide: square
 export const RectangleIcon = createIcon(
   <g strokeWidth="1.5">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+    <rect width="18" height="18" x="3" y="3" rx="2" />
   </g>,
   tablerIconProps,
 );
 
 // tabler-icons: square-rotated
+// FORK(board) lucide: diamond
 export const DiamondIcon = createIcon(
   <g strokeWidth="1.5">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M10.5 20.4l-6.9 -6.9c-.781 -.781 -.781 -2.219 0 -3l6.9 -6.9c.781 -.781 2.219 -.781 3 0l6.9 6.9c.781 .781 .781 2.219 0 3l-6.9 6.9c-.781 .781 -2.219 .781 -3 0z" />
+    <path d="M2.7 10.3a2.41 2.41 0 0 0 0 3.41l7.59 7.59a2.41 2.41 0 0 0 3.41 0l7.59-7.59a2.41 2.41 0 0 0 0-3.41l-7.59-7.59a2.41 2.41 0 0 0-3.41 0Z" />
   </g>,
-
   tablerIconProps,
 );
 
 // tabler-icons: circle
+// FORK(board) lucide: circle
 export const EllipseIcon = createIcon(
   <g strokeWidth="1.5">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <circle cx="12" cy="12" r="9"></circle>
+    <circle cx="12" cy="12" r="10" />
   </g>,
-
   tablerIconProps,
 );
 
 // tabler-icons: arrow-narrow-right
+// FORK(board) lucide: arrow-up-right
 export const ArrowIcon = createIcon(
   <g strokeWidth="1.5">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <line x1="5" y1="12" x2="19" y2="12" />
-    <line x1="15" y1="16" x2="19" y2="12" />
-    <line x1="15" y1="8" x2="19" y2="12" />
+    <path d="M7 7h10v10" />
+    <path d="M7 17 17 7" />
   </g>,
   tablerIconProps,
 );
 
 // custom?
+// FORK(board) lucide: slash
 export const LineIcon = createIcon(
-  <path d="M4.167 10h11.666" strokeWidth="1.5" />,
-  modifiedTablerIconProps,
+  <g strokeWidth="1.5">
+    <path d="M22 2 2 22" />
+  </g>,
+  tablerIconProps,
 );
 
 export const PenModeIcon = createIcon(
@@ -330,60 +297,62 @@ export const PenModeIcon = createIcon(
 );
 
 // modified tabler-icons: pencil
+// FORK(board) lucide: pencil
 export const FreedrawIcon = createIcon(
-  <g strokeWidth="1.25">
-    <path
-      clipRule="evenodd"
-      d="m7.643 15.69 7.774-7.773a2.357 2.357 0 1 0-3.334-3.334L4.31 12.357a3.333 3.333 0 0 0-.977 2.357v1.953h1.953c.884 0 1.732-.352 2.357-.977Z"
-    />
-    <path d="m11.25 5.417 3.333 3.333" />
+  <g strokeWidth="1.5">
+    <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+    <path d="m15 5 4 4" />
   </g>,
-
-  modifiedTablerIconProps,
+  tablerIconProps,
 );
 
 // tabler-icons: typography
+// FORK(board) lucide: type
 export const TextIcon = createIcon(
   <g strokeWidth="1.5">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <line x1="4" y1="20" x2="7" y2="20" />
-    <line x1="14" y1="20" x2="21" y2="20" />
-    <line x1="6.9" y1="15" x2="13.8" y2="15" />
-    <line x1="10.2" y1="6.3" x2="16" y2="20" />
-    <polyline points="5 20 11 4 13 4 20 20"></polyline>
+    <path d="M12 4v16" />
+    <path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2" />
+    <path d="M9 20h6" />
   </g>,
   tablerIconProps,
 );
 
 // modified tabler-icons: photo
+// FORK(board) lucide: image
 export const ImageIcon = createIcon(
-  <g strokeWidth="1.25">
-    <path d="M12.5 6.667h.01" />
-    <path d="M4.91 2.625h10.18a2.284 2.284 0 0 1 2.285 2.284v10.182a2.284 2.284 0 0 1-2.284 2.284H4.909a2.284 2.284 0 0 1-2.284-2.284V4.909a2.284 2.284 0 0 1 2.284-2.284Z" />
-    <path d="m3.333 12.5 3.334-3.333c.773-.745 1.726-.745 2.5 0l4.166 4.166" />
-    <path d="m11.667 11.667.833-.834c.774-.744 1.726-.744 2.5 0l1.667 1.667" />
-  </g>,
-  modifiedTablerIconProps,
-);
-
-// tabler-icons: eraser
-export const EraserIcon = createIcon(
   <g strokeWidth="1.5">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M19 20h-10.5l-4.21 -4.3a1 1 0 0 1 0 -1.41l10 -10a1 1 0 0 1 1.41 0l5 5a1 1 0 0 1 0 1.41l-9.2 9.3" />
-    <path d="M18 13.3l-6.3 -6.3" />
+    <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+    <circle cx="9" cy="9" r="2" />
+    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
   </g>,
   tablerIconProps,
 );
 
-export const ZoomInIcon = createIcon(
-  <path strokeWidth="1.25" d="M10 4.167v11.666M4.167 10h11.666" />,
-  modifiedTablerIconProps,
+// tabler-icons: eraser
+// FORK(board) lucide: eraser
+export const EraserIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path d="M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21" />
+    <path d="m5.082 11.09 8.828 8.828" />
+  </g>,
+  tablerIconProps,
 );
 
+// FORK(board) lucide: plus
+export const ZoomInIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path d="M5 12h14" />
+    <path d="M12 5v14" />
+  </g>,
+  tablerIconProps,
+);
+
+// FORK(board) lucide: minus
 export const ZoomOutIcon = createIcon(
-  <path d="M5 10h10" strokeWidth="1.25" />,
-  modifiedTablerIconProps,
+  <g strokeWidth="1.5">
+    <path d="M5 12h14" />
+  </g>,
+  tablerIconProps,
 );
 
 export const ZoomResetIcon = createIcon(
@@ -396,12 +365,16 @@ export const ZoomResetIcon = createIcon(
   tablerIconProps,
 );
 
+// FORK(board) lucide: trash-2
 export const TrashIcon = createIcon(
-  <path
-    strokeWidth="1.25"
-    d="M3.333 5.833h13.334M8.333 9.167v5M11.667 9.167v5M4.167 5.833l.833 10c0 .92.746 1.667 1.667 1.667h6.666c.92 0 1.667-.746 1.667-1.667l.833-10M7.5 5.833v-2.5c0-.46.373-.833.833-.833h3.334c.46 0 .833.373.833.833v2.5"
-  />,
-  modifiedTablerIconProps,
+  <g strokeWidth="1.5">
+    <path d="M10 11v6" />
+    <path d="M14 11v6" />
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+    <path d="M3 6h18" />
+    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+  </g>,
+  tablerIconProps,
 );
 
 export const EmbedIcon = createIcon(
@@ -439,12 +412,12 @@ export const SunIcon = createIcon(
   { ...modifiedTablerIconProps, strokeWidth: 1.5 },
 );
 
+// FORK(board) lucide: menu
 export const HamburgerMenuIcon = createIcon(
   <g strokeWidth="1.5">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-    <line x1="4" y1="6" x2="20" y2="6"></line>
-    <line x1="4" y1="12" x2="20" y2="12"></line>
-    <line x1="4" y1="18" x2="20" y2="18"></line>
+    <path d="M4 5h16" />
+    <path d="M4 12h16" />
+    <path d="M4 19h16" />
   </g>,
   tablerIconProps,
 );
@@ -457,12 +430,12 @@ export const ExportIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+// FORK(board) lucide: circle-question-mark
 export const HelpIcon = createIcon(
   <g strokeWidth="1.5">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-    <circle cx="12" cy="12" r="9"></circle>
-    <line x1="12" y1="17" x2="12" y2="17.01"></line>
-    <path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4"></path>
+    <circle cx="12" cy="12" r="10" />
+    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+    <path d="M12 17h.01" />
   </g>,
   tablerIconProps,
 );
@@ -564,15 +537,13 @@ export const bucketFillIcon = createIcon(
   tablerIconProps,
 );
 
+// FORK(board) lucide: image-down
 export const ExportImageIcon = createIcon(
-  <g strokeWidth="1.25">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-    <path d="M15 8h.01"></path>
-    <path d="M12 20h-5a3 3 0 0 1 -3 -3v-10a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v5"></path>
-    <path d="M4 15l4 -4c.928 -.893 2.072 -.893 3 0l4 4"></path>
-    <path d="M14 14l1 -1c.617 -.593 1.328 -.793 2.009 -.598"></path>
-    <path d="M19 16v6"></path>
-    <path d="M22 19l-3 3l-3 -3"></path>
+  <g strokeWidth="1.5">
+    <path d="M10.3 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10l-3.1-3.1a2 2 0 0 0-2.814.014L6 21" />
+    <path d="m14 19 3 3v-5.5" />
+    <path d="m17 22 3-3" />
+    <circle cx="9" cy="9" r="2" />
   </g>,
   tablerIconProps,
 );
@@ -600,20 +571,22 @@ export const menu = createIcon(
   "M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z",
 );
 
+// FORK(board) lucide: undo-2
 export const UndoIcon = createIcon(
-  <path
-    d="M7.5 10.833 4.167 7.5 7.5 4.167M4.167 7.5h9.166a3.333 3.333 0 0 1 0 6.667H12.5"
-    strokeWidth="1.25"
-  />,
-  modifiedTablerIconProps,
+  <g strokeWidth="1.5">
+    <path d="M9 14 4 9l5-5" />
+    <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11" />
+  </g>,
+  tablerIconProps,
 );
 
+// FORK(board) lucide: redo-2
 export const RedoIcon = createIcon(
-  <path
-    d="M12.5 10.833 15.833 7.5 12.5 4.167M15.833 7.5H6.667a3.333 3.333 0 1 0 0 6.667H7.5"
-    strokeWidth="1.25"
-  />,
-  modifiedTablerIconProps,
+  <g strokeWidth="1.5">
+    <path d="m15 14 5-5-5-5" />
+    <path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13" />
+  </g>,
+  tablerIconProps,
 );
 
 export const questionCircle = createIcon(
@@ -1667,13 +1640,13 @@ export const eraser = createIcon(
   <path d="M480 416C497.7 416 512 430.3 512 448C512 465.7 497.7 480 480 480H150.6C133.7 480 117.4 473.3 105.4 461.3L25.37 381.3C.3786 356.3 .3786 315.7 25.37 290.7L258.7 57.37C283.7 32.38 324.3 32.38 349.3 57.37L486.6 194.7C511.6 219.7 511.6 260.3 486.6 285.3L355.9 416H480zM265.4 416L332.7 348.7L195.3 211.3L70.63 336L150.6 416L265.4 416z" />,
 );
 
+// FORK(board) lucide: hand
 export const handIcon = createIcon(
-  <g strokeWidth={1.25}>
-    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-    <path d="M8 13v-7.5a1.5 1.5 0 0 1 3 0v6.5"></path>
-    <path d="M11 5.5v-2a1.5 1.5 0 1 1 3 0v8.5"></path>
-    <path d="M14 5.5a1.5 1.5 0 0 1 3 0v6.5"></path>
-    <path d="M17 7.5a1.5 1.5 0 0 1 3 0v8.5a6 6 0 0 1 -6 6h-2h.208a6 6 0 0 1 -5.012 -2.7a69.74 69.74 0 0 1 -.196 -.3c-.312 -.479 -1.407 -2.388 -3.286 -5.728a1.5 1.5 0 0 1 .536 -2.022a1.867 1.867 0 0 1 2.28 .28l1.47 1.47"></path>
+  <g strokeWidth="1.5">
+    <path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2" />
+    <path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2" />
+    <path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8" />
+    <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
   </g>,
   tablerIconProps,
 );
@@ -1765,12 +1738,12 @@ export const eyeDropperIcon = createIcon(
   tablerIconProps,
 );
 
+// FORK(board) lucide: shapes
 export const extraToolsIcon = createIcon(
-  <g strokeWidth={1.5}>
-    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-    <path d="M12 3l-4 7h8z"></path>
-    <path d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
-    <path d="M4 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path>
+  <g strokeWidth="1.5">
+    <path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z" />
+    <rect x="3" y="14" width="7" height="7" rx="1" />
+    <circle cx="17.5" cy="17.5" r="3.5" />
   </g>,
   tablerIconProps,
 );

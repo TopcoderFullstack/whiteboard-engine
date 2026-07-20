@@ -23,6 +23,8 @@
 | 4 | `.github/workflows/`（删除） | 移除上游 CI | fork 不运行上游发布自动化；且 OAuth token 无 workflow scope 无法推送 | 中：上游改 workflow 时产生 modify/delete 冲突，同步时一律保持删除 |
 | 5 | `css/theme.scss`（61 处）`components/TextField.scss`（3 处） | 主题合同：内部颜色变量包裹为 `var(--board-*, 原值)` | 宿主 token 驱动引擎全局风格，见 THEME-CONTRACT.md | 中：上游改 theme.scss 需按合同文档重对映射（保包裹模式、换回退值） |
 | 6 | `THEME-CONTRACT.md` | 合同文档 | — | 无（新文件） |
+| 7 | `components/icons.tsx`（23 个图标重绘） | 核心 chrome 图标替换为 lucide 几何（stroke 1.5，标 `FORK(board) lucide:` 注释） | 与宿主桌面 dock/菜单同一图标语言 | 中：上游改这些图标定义时冲突，保留 lucide 版并核对新增用途 |
+| 8 | `css/board-effects.scss` + `ToolIcon.scss`（1 行 import） | 图标互动特效（hover 弹性/按压/选中 tint 发光+弹跳，含 reduced-motion 降级） | 桌面级质感 | 低：新文件 + 单行 import |
 
 ## 构建与发布 runbook
 

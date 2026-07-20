@@ -32,6 +32,8 @@ topcoderfullstack 桌面工作台「画板」app 的自有画布引擎，进行�
 4. 验证注意：画板窗口内容高度低于约 500px 会触发 Excalidraw 移动端布局
    （UI 结构大变，不是 bug），验证桌面布局时保持大窗口
 5. sass deprecation 告警是上游历史遗留，无害，忽略
+6. **同步撞车警告**：宿主的 engine:watch 在跑时，改完源码交给它自动 build+sync 即可，
+   不要再手动 build 或手动拷 dist（两个进程并发 rm/cp 会拷出半成品导致宿主 500）
 
 ## 改造纪律
 
