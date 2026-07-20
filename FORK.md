@@ -26,6 +26,7 @@
 | 7 | `components/icons.tsx`（23 个图标重绘） | 核心 chrome 图标替换为 lucide 几何（stroke 1.5，标 `FORK(board) lucide:` 注释） | 与宿主桌面 dock/菜单同一图标语言 | 中：上游改这些图标定义时冲突，保留 lucide 版并核对新增用途 |
 | 8 | `css/board-effects.scss` + `ToolIcon.scss`（1 行 import） | 图标互动特效（hover 弹性/按压/选中 tint 发光+弹跳，含 reduced-motion 降级；作用于菜单/撤销/缩放等按钮） | 桌面级质感 | 低：新文件 + 单行 import |
 | 9 | `css/board-effects.scss` | 废弃引擎形状工具栏（`.shapes-section` 隐藏）；撤销/重做移到右下 | 工具栏由宿主用 React Bits Dock 自绘（setActiveTool 驱动，见宿主 board-dock.tsx） | 低：纯 CSS，上游布局重构时复查 |
+| 10 | `components/App.tsx` + `types.ts` | imperative API 暴露 `runAction(name, value?)`（actionManager 直通） | 宿主自绘属性面板/未来自绘 chrome 驱动引擎 action（undo/redo/图层/对齐/字号/箭头…） | 低：API 组装处附加字段，上游冲突面小 |
 
 ## 构建与发布 runbook
 

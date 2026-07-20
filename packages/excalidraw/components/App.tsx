@@ -745,6 +745,18 @@ class App extends React.Component<AppProps, AppState> {
         onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
         onScrollChange: (cb) => this.onScrollChangeEmitter.on(cb),
         onUserFollow: (cb) => this.onUserFollowEmitter.on(cb),
+        // FORK(board): 按名称执行内部 action（undo/redo/图层/对齐/复制/删除…），
+        // 供宿主自绘 chrome 驱动引擎行为
+        runAction: (name: string, value?: unknown) => {
+          const action = (
+            this.actionManager.actions as Record<string, Action | undefined>
+          )[name];
+          if (action) {
+            this.actionManager.executeAction(action, "api", value);
+          } else {
+            console.warn(`[board] unknown action: ${name}`);
+          }
+        },
       } as const;
       if (typeof excalidrawAPI === "function") {
         excalidrawAPI(api);
