@@ -31,11 +31,21 @@ function buildAndSync(reason) {
   const t = Date.now()
   process.stdout.write(`[fork-dev] rebuild (${reason}) ... `)
   try {
-    rmSync(path.join(pkgDir, "dist"), { recursive: true, force: true })
+    // 只清 prod/dev（避免旧 hash chunk 残留）；dist/types 由 tsc 生成，
+    // esbuild 不会重建，必须保留，缺失时补一次
+    rmSync(path.join(pkgDir, "dist", "prod"), { recursive: true, force: true })
+    rmSync(path.join(pkgDir, "dist", "dev"), { recursive: true, force: true })
     execSync("node ../../scripts/buildPackage.js", {
       cwd: pkgDir,
       stdio: ["ignore", "ignore", "inherit"],
     })
+    if (!existsSync(path.join(pkgDir, "dist", "types"))) {
+      process.stdout.write("types ... ")
+      execSync("corepack yarn gen:types", {
+        cwd: pkgDir,
+        stdio: ["ignore", "ignore", "inherit"],
+      })
+    }
     rmSync(target, { recursive: true, force: true })
     cpSync(path.join(pkgDir, "dist"), target, { recursive: true })
     console.log(`built + synced in ${((Date.now() - t) / 1000).toFixed(1)}s`)
