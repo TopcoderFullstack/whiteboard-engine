@@ -57,12 +57,24 @@
   display: none;
 }
 
-// FORK(board): 撤销/重做移到右下（帮助按钮左侧），避免与底部 dock 工具栏碰撞
-.excalidraw {
-  .undo-redo-buttons {
-    position: absolute;
-    right: 3.25rem;
-    bottom: 0;
-    z-index: 4;
-  }
+// FORK(board): 画布内原生 chrome 全部废弃 ——
+// 缩放/撤销重做/帮助迁至宿主窗口标题栏簇，素材库开关同置标题栏
+.excalidraw .zoom-actions,
+.excalidraw .undo-redo-buttons,
+.excalidraw .help-icon,
+.excalidraw .sidebar-trigger {
+  display: none;
+}
+
+// FORK(board): 素材库侧栏外置 —— 宿主在 .wb-shell 上加 wb-lib-external 类并提供
+// --wb-lib-* 变量时，侧栏以 fixed 逃出窗口悬浮在窗外右侧；否则回退引擎默认停靠
+.wb-lib-external .excalidraw .sidebar {
+  position: fixed;
+  left: var(--wb-lib-left);
+  top: var(--wb-lib-top);
+  right: auto;
+  height: var(--wb-lib-height);
+  border: 2px solid var(--wb-tint, var(--default-border-color));
+  border-radius: 14px;
+  box-shadow: var(--shadow-island);
 }
