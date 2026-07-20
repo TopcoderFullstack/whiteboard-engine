@@ -56,7 +56,8 @@ scripts/fork-release.sh X.Y.Z-fork.0
 
 - 包名 `@topcoderfullstack/board-core`；不以 "Excalidraw" 名义发布（商标不在 MIT
   授权范围内），保留上游 LICENSE 与版权声明。
-- 代码地图（改造前须读）：`packages/excalidraw` 编辑器主包（UI/actions/工具栏）、
-  `packages/element` 元素逻辑、`packages/common`/`math`/`utils` 基础库、
-  `components/App.tsx` 交互状态机（万行级）、`renderer/` 画布渲染。
+- 代码地图（改造前须读，v0.18.1 布局）：`packages/excalidraw` 编辑器主包
+  （`components/` UI、`actions/` 动作、`element/` 元素逻辑、`renderer/` 画布渲染、
+  `components/App.tsx` 交互状态机（万行级）、`locales/` 文案）、
+  `packages/math`/`utils` 基础库。
   `excalidraw-app/` 是官网应用，不使用也不删除（避免 merge 时 modify/delete 噪音）。
