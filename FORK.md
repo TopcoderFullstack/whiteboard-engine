@@ -31,6 +31,7 @@
 | 12 | `data/library.ts` `mergeLibraryItems` | 合并前先按 item.id 判重（标 `FORK(board)` 注释） | 上游按元素逐一判重，restoreLibraryItems 重造元素内部字段后判重失效，网络导入 + adapter 初始加载重复合并会产生重复条目 | 低：单函数小改，上游改动时保留 id 先行判重 |
 | 13 | `components/App.tsx` + `types.ts` + `css/board-effects.scss` | imperative API 暴露 `insertLibraryItems(items)`（onInsertElements + 方阵分布直通）；引擎默认侧栏整体隐藏 | 素材库由宿主自绘面板接管（搜索/来源分组/放大预览，见宿主 board-library.tsx） | 低：API 组装处附加字段 + 纯 CSS |
 | 14 | `components/App.tsx` `updateDOMRect` | 尺寸变化时在同一 setState 内按**容器原点位移**补偿 scrollX/scrollY（随缩放换算；纯移动不补偿；首测 0 尺寸跳过） | 内容钉死屏幕坐标：上游锚定左上在浏览器整窗形态天然"没动"，宿主桌面窗口原点会动（最大化动画/左上边缘拖拽），原点位移补偿让缩放期间内容在屏幕上纹丝不动 | 低：单函数小改 |
+| 15 | `components/canvases/StaticCanvas.tsx` + `InteractiveCanvas.tsx` | 重绘从 useEffect（paint 后）改为 useLayoutEffect（paint 前），几何指纹（尺寸/偏移/scale）变化的提交绕过 rAF 节流同步落画 | 尺寸变化的提交若延后重绘会先画一帧"旧画面在新位置"（窗口缩放结束的跳变）；普通内容更新仍走节流不伤性能 | 中：上游改画布组件时需保留 layoutEffect + 指纹旁路 |
 
 ## 构建与发布 runbook
 

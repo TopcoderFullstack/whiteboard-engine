@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import { renderStaticScene } from "../../renderer/staticScene";
 import { isShallowEqual } from "../../utils";
@@ -29,8 +29,11 @@ type StaticCanvasProps = {
 const StaticCanvas = (props: StaticCanvasProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const isComponentMounted = useRef(false);
+  // FORK(board): 几何指纹 —— 尺寸/偏移变化的提交须绕过 rAF 节流同步重绘，
+  // 否则会先画一帧"旧画面在新位置"（窗口缩放结束时的跳变）
+  const geometryRef = useRef("");
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const wrapper = wrapperRef.current;
     if (!wrapper) {
       return;
@@ -65,6 +68,12 @@ const StaticCanvas = (props: StaticCanvasProps) => {
       canvas.height = scaledHeight;
     }
 
+    // FORK(board): useLayoutEffect（paint 前）+ 几何变化不节流 —— 尺寸与
+    // 补偿滚动在同一提交内落画，不存在陈旧光栅帧；普通内容更新仍节流
+    const geometry = `${props.appState.width}x${props.appState.height}@${props.appState.offsetLeft},${props.appState.offsetTop}|${props.scale}`;
+    const geometryChanged = geometryRef.current !== geometry;
+    geometryRef.current = geometry;
+
     renderStaticScene(
       {
         canvas,
@@ -76,7 +85,7 @@ const StaticCanvas = (props: StaticCanvasProps) => {
         appState: props.appState,
         renderConfig: props.renderConfig,
       },
-      isRenderThrottlingEnabled(),
+      isRenderThrottlingEnabled() && !geometryChanged,
     );
   });
 

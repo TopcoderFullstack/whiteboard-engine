@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import { isShallowEqual, sceneCoordsToViewportCoords } from "../../utils";
 import { CURSOR_TYPE } from "../../constants";
 import { t } from "../../i18n";
@@ -64,12 +64,18 @@ type InteractiveCanvasProps = {
 
 const InteractiveCanvas = (props: InteractiveCanvasProps) => {
   const isComponentMounted = useRef(false);
+  // FORK(board): 同 StaticCanvas —— 几何变化的提交绕过节流、paint 前落画
+  const geometryRef = useRef("");
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isComponentMounted.current) {
       isComponentMounted.current = true;
       return;
     }
+
+    const geometry = `${props.appState.width}x${props.appState.height}@${props.appState.offsetLeft},${props.appState.offsetTop}|${props.scale}`;
+    const geometryChanged = geometryRef.current !== geometry;
+    geometryRef.current = geometry;
 
     const remotePointerButton: InteractiveCanvasRenderConfig["remotePointerButton"] =
       new Map();
@@ -141,7 +147,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
         device: props.device,
         callback: props.renderInteractiveSceneCallback,
       },
-      isRenderThrottlingEnabled(),
+      isRenderThrottlingEnabled() && !geometryChanged,
     );
   });
 
