@@ -11109,12 +11109,28 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      // FORK(board): 容器尺寸变化时按半差量补偿滚动（随缩放换算），
+      // 视口中心内容保持稳定 —— 与尺寸更新同一次 setState，同帧重绘，
+      // 不会出现"先缩去左上再弹回中心"。首次测量（0 尺寸）不补偿。
+      const scrollCompensation =
+        currentWidth && currentHeight
+          ? {
+              scrollX:
+                this.state.scrollX +
+                (width - currentWidth) / 2 / this.state.zoom.value,
+              scrollY:
+                this.state.scrollY +
+                (height - currentHeight) / 2 / this.state.zoom.value,
+            }
+          : null;
+
       this.setState(
         {
           width,
           height,
           offsetLeft,
           offsetTop,
+          ...(scrollCompensation ?? {}),
         },
         () => {
           cb && cb();

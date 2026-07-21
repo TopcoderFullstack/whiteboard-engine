@@ -30,6 +30,7 @@
 | 11 | `css/board-effects.scss` | 隐藏画布内缩放/撤销重做/帮助/素材库按钮与右键菜单（宿主标题栏簇 + 宿主 BoardContextMenu 接管，右键状态经 appState.contextMenu 映射）；素材库侧栏经 `wb-lib-external` + `--wb-lib-*` 变量 fixed 外置窗外右侧 | 画布内零 chrome；引擎菜单溢出容器会顶起画布 | 低：纯 CSS |
 | 12 | `data/library.ts` `mergeLibraryItems` | 合并前先按 item.id 判重（标 `FORK(board)` 注释） | 上游按元素逐一判重，restoreLibraryItems 重造元素内部字段后判重失效，网络导入 + adapter 初始加载重复合并会产生重复条目 | 低：单函数小改，上游改动时保留 id 先行判重 |
 | 13 | `components/App.tsx` + `types.ts` + `css/board-effects.scss` | imperative API 暴露 `insertLibraryItems(items)`（onInsertElements + 方阵分布直通）；引擎默认侧栏整体隐藏 | 素材库由宿主自绘面板接管（搜索/来源分组/放大预览，见宿主 board-library.tsx） | 低：API 组装处附加字段 + 纯 CSS |
+| 14 | `components/App.tsx` `updateDOMRect` | 容器尺寸变化时在同一 setState 内按半差量补偿 scrollX/scrollY（随缩放换算，首测 0 尺寸跳过） | 窗口缩放/最大化时视口中心内容保持稳定；宿主侧补偿慢一帧会"先移后回" | 低：单函数小改 |
 
 ## 构建与发布 runbook
 
