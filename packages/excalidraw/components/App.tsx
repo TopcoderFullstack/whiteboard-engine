@@ -11128,18 +11128,26 @@ class App extends React.Component<AppProps, AppState> {
             }
           : null;
 
-      this.setState(
-        {
-          width,
-          height,
-          offsetLeft,
-          offsetTop,
-          ...(scrollCompensation ?? {}),
-        },
-        () => {
-          cb && cb();
-        },
-      );
+      // 两个独立 setState（而非三元 union）：union 参数会让 setState 推出单一
+      // 键集（合并两分支=6 键），使不含补偿的 4 键分支缺 scrollX/scrollY 而报错。
+      const done = () => {
+        cb && cb();
+      };
+      if (scrollCompensation) {
+        this.setState(
+          {
+            width,
+            height,
+            offsetLeft,
+            offsetTop,
+            scrollX: scrollCompensation.scrollX,
+            scrollY: scrollCompensation.scrollY,
+          },
+          done,
+        );
+      } else {
+        this.setState({ width, height, offsetLeft, offsetTop }, done);
+      }
     }
   };
 
