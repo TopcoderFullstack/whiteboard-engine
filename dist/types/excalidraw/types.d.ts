@@ -601,6 +601,10 @@ export type PointerDownState = Readonly<{
 }>;
 export type UnsubscribeCallback = () => void;
 export interface ExcalidrawImperativeAPI {
+    /** FORK(board): 按名称执行内部 action（如 "undo" "sendBackward" "changeFontSize"），value 传给 action 的 perform */
+    runAction: (name: string, value?: unknown) => void;
+    /** FORK(board): 宿主自绘素材面板插入素材（按方阵分布落到视口中心） */
+    insertLibraryItems: (libraryItems: LibraryItems) => void;
     updateScene: InstanceType<typeof App>["updateScene"];
     updateLibrary: InstanceType<typeof Library>["updateLibrary"];
     resetScene: InstanceType<typeof App>["resetScene"];

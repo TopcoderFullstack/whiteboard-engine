@@ -1,6 +1,6 @@
 {
   "name": "@topcoderfullstack/board-core",
-  "version": "0.18.1-fork.0",
+  "version": "0.18.1-fork.1",
   "type": "module",
   "types": "./dist/types/excalidraw/index.d.ts",
   "main": "./dist/prod/index.js",
@@ -26,7 +26,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "description": "Whiteboard engine for the desktop workspace (fork of @excalidraw/excalidraw v0.18.1, MIT)",
+  "description": "Whiteboard engine for the desktop workspace (fork of @excalidraw/excalidraw, MIT)",
   "license": "MIT",
   "keywords": [
     "excalidraw",
