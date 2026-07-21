@@ -137,9 +137,13 @@ export const mergeLibraryItems = (
   localItems: LibraryItems,
   otherItems: LibraryItems,
 ): LibraryItems => {
+  // FORK(board): dedupe by item id first — the element-wise uniqueness check
+  // below fails once restoreLibraryItems regenerates element internals, which
+  // duplicated identical items on repeated merges (web import + adapter init).
+  const localIds = new Set(localItems.map((item) => item.id));
   const newItems = [];
   for (const item of otherItems) {
-    if (isUniqueItem(localItems, item)) {
+    if (!localIds.has(item.id) && isUniqueItem(localItems, item)) {
       newItems.push(item);
     }
   }

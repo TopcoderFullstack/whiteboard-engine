@@ -28,6 +28,7 @@
 | 9 | `css/board-effects.scss` | 废弃引擎形状工具栏（`.shapes-section` 隐藏）；撤销/重做移到右下 | 工具栏由宿主用 React Bits Dock 自绘（setActiveTool 驱动，见宿主 board-dock.tsx） | 低：纯 CSS，上游布局重构时复查 |
 | 10 | `components/App.tsx` + `types.ts` | imperative API 暴露 `runAction(name, value?)`（actionManager 直通） | 宿主自绘属性面板/未来自绘 chrome 驱动引擎 action（undo/redo/图层/对齐/字号/箭头…） | 低：API 组装处附加字段，上游冲突面小 |
 | 11 | `css/board-effects.scss` | 隐藏画布内缩放/撤销重做/帮助/素材库按钮与右键菜单（宿主标题栏簇 + 宿主 BoardContextMenu 接管，右键状态经 appState.contextMenu 映射）；素材库侧栏经 `wb-lib-external` + `--wb-lib-*` 变量 fixed 外置窗外右侧 | 画布内零 chrome；引擎菜单溢出容器会顶起画布 | 低：纯 CSS |
+| 12 | `data/library.ts` `mergeLibraryItems` | 合并前先按 item.id 判重（标 `FORK(board)` 注释） | 上游按元素逐一判重，restoreLibraryItems 重造元素内部字段后判重失效，网络导入 + adapter 初始加载重复合并会产生重复条目 | 低：单函数小改，上游改动时保留 id 先行判重 |
 
 ## 构建与发布 runbook
 
