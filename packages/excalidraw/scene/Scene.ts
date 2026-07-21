@@ -294,9 +294,15 @@ class Scene {
         : Array.from(nextElements.values());
     const nextFrameLikes: ExcalidrawFrameLikeElement[] = [];
 
-    validateIndicesThrottled(_nextElements);
-
     this.elements = syncInvalidIndices(_nextElements);
+
+    // FORK(board): 校验挪到 syncInvalidIndices 之后（上游是先校验后修复）。
+    // duplicateSelection/paste 提交的克隆体经 deepCopyElement 会原样复制源的
+    // fractional index，索引在上一行才被重排修复。先校验会在修复前看到这段
+    // 瞬时冲突而误报（dev 下 shouldThrow 还会 throw，中断该次提交/复制）。
+    // 校验修复后的结果：消除误报，且仍能暴露 syncInvalidIndices 无法自动修复
+    // 的真实损坏（如绑定文本顺序，includeBoundTextValidation）。
+    validateIndicesThrottled(this.elements);
     this.elementsMap.clear();
     this.elements.forEach((element) => {
       if (isFrameLikeElement(element)) {
