@@ -29,6 +29,7 @@
 | 10 | `components/App.tsx` + `types.ts` | imperative API 暴露 `runAction(name, value?)`（actionManager 直通） | 宿主自绘属性面板/未来自绘 chrome 驱动引擎 action（undo/redo/图层/对齐/字号/箭头…） | 低：API 组装处附加字段，上游冲突面小 |
 | 11 | `css/board-effects.scss` | 隐藏画布内缩放/撤销重做/帮助/素材库按钮与右键菜单（宿主标题栏簇 + 宿主 BoardContextMenu 接管，右键状态经 appState.contextMenu 映射）；素材库侧栏经 `wb-lib-external` + `--wb-lib-*` 变量 fixed 外置窗外右侧 | 画布内零 chrome；引擎菜单溢出容器会顶起画布 | 低：纯 CSS |
 | 12 | `data/library.ts` `mergeLibraryItems` | 合并前先按 item.id 判重（标 `FORK(board)` 注释） | 上游按元素逐一判重，restoreLibraryItems 重造元素内部字段后判重失效，网络导入 + adapter 初始加载重复合并会产生重复条目 | 低：单函数小改，上游改动时保留 id 先行判重 |
+| 13 | `components/App.tsx` + `types.ts` + `css/board-effects.scss` | imperative API 暴露 `insertLibraryItems(items)`（onInsertElements + 方阵分布直通）；引擎默认侧栏整体隐藏 | 素材库由宿主自绘面板接管（搜索/来源分组/放大预览，见宿主 board-library.tsx） | 低：API 组装处附加字段 + 纯 CSS |
 
 ## 构建与发布 runbook
 

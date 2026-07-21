@@ -79,3 +79,9 @@
   border-radius: 14px;
   box-shadow: var(--shadow-island);
 }
+
+// FORK(board): 素材库由宿主自绘面板接管，引擎默认侧栏整体废弃
+.excalidraw .sidebar,
+.excalidraw .default-sidebar {
+  display: none !important;
+}

@@ -757,6 +757,12 @@ class App extends React.Component<AppProps, AppState> {
             console.warn(`[board] unknown action: ${name}`);
           }
         },
+        // FORK(board): 宿主自绘素材面板点击插入（与引擎侧栏同一插入路径）
+        insertLibraryItems: (libraryItems: LibraryItems) => {
+          this.onInsertElements(
+            distributeLibraryItemsOnSquareGrid(libraryItems),
+          );
+        },
       } as const;
       if (typeof excalidrawAPI === "function") {
         excalidrawAPI(api);
