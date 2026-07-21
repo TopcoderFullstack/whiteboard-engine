@@ -33,7 +33,17 @@ json.dump(pkg, open(f"{tmp}/package.json", "w"), indent=2)
 EOF
 
 cd "$TMP"
+# -f 强制纳入 dist（防任何 .gitignore 规则漏掉产物）；再 -A 收尾 package.json/LICENSE
+git add -Af dist
 git add -A
+# 发布保险：dev/prod/types 三样产物必须都在 index 里，否则中止（绝不 push 残缺
+# release）。曾出现过只发出 dist/types、dev/prod 缺失导致线上引擎无代码的事故。
+for d in dev prod types; do
+  if [ -z "$(git ls-files "dist/$d" | head -1)" ]; then
+    echo "ERROR: dist/$d 未纳入 release —— 中止，未 push。检查 build:esm 产物。" >&2
+    exit 1
+  fi
+done
 git commit -m "release: $VERSION"
 git push origin release
 echo "released $VERSION — 主应用执行: bun update @excalidraw/excalidraw"
