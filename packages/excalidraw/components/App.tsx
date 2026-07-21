@@ -11109,18 +11109,22 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      // FORK(board): 容器尺寸变化时按半差量补偿滚动（随缩放换算），
-      // 视口中心内容保持稳定 —— 与尺寸更新同一次 setState，同帧重绘，
-      // 不会出现"先缩去左上再弹回中心"。首次测量（0 尺寸）不补偿。
+      // FORK(board): 尺寸变化期间内容钉死在屏幕坐标（窗口只是滑过画布的
+      // 取景框）：上游锚定左上在浏览器整窗形态下天然"看起来没动"，但宿主
+      // 桌面窗口的原点会动（最大化动画/左上边缘拖拽）。补偿量 = 容器原点
+      // 位移（随缩放换算），与尺寸更新同一次 setState 原子生效。
+      // 纯移动（尺寸不变）不补偿 —— 拖窗时内容理应跟窗走。
+      const sizeChanged =
+        width !== currentWidth || height !== currentHeight;
       const scrollCompensation =
-        currentWidth && currentHeight
+        currentWidth && currentHeight && sizeChanged
           ? {
               scrollX:
-                this.state.scrollX +
-                (width - currentWidth) / 2 / this.state.zoom.value,
+                this.state.scrollX -
+                (offsetLeft - currentOffsetLeft) / this.state.zoom.value,
               scrollY:
-                this.state.scrollY +
-                (height - currentHeight) / 2 / this.state.zoom.value,
+                this.state.scrollY -
+                (offsetTop - currentOffsetTop) / this.state.zoom.value,
             }
           : null;
 
