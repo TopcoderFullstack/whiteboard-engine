@@ -80,6 +80,9 @@ import {
   ExportIcon,
   ExportImageIcon,
   ExternalLinkIcon,
+  FLOW_DEFAULT_SPEED,
+  FLOW_MAX_SPEED,
+  FLOW_MIN_SPEED,
   FONT_FAMILY,
   FRAME_STYLE,
   FillCrossHatchIcon,
@@ -219,6 +222,7 @@ import {
   canApplyRoundnessTypeToElement,
   canChangeRoundness,
   canCreateLinkFromElements,
+  canElementFlow,
   canHaveArrowheads,
   canvasToBlob,
   capitalizeString,
@@ -320,6 +324,7 @@ import {
   getDefaultRoundnessTypeForElement,
   getDragOffsetXY,
   getElementAbsoluteCoords,
+  getElementFlow,
   getElementShape,
   getElementWithTransformHandleType,
   getElementsInGroup,
@@ -332,6 +337,7 @@ import {
   getFileFromEvent,
   getFileHandleType,
   getFlipAdjustedCropPosition,
+  getFlowMode,
   getFontFamilyString,
   getFontString,
   getFrame,
@@ -416,6 +422,7 @@ import {
   isDevEnv,
   isElbowArrow,
   isElementCompletelyInViewport,
+  isElementFlowing,
   isElementInFrame,
   isElementInGroup,
   isElementInViewport,
@@ -618,7 +625,7 @@ import {
   wrapText,
   youtubeIcon,
   zoomAreaIcon
-} from "./chunk-CHSOEA7N.js";
+} from "./chunk-GEKQESWL.js";
 import {
   define_import_meta_env_default
 } from "./chunk-AWQI2HM3.js";
@@ -6478,7 +6485,7 @@ var exportCanvas = async (type, elements, appState, files, {
     let blob = canvasToBlob(tempCanvas);
     if (appState.exportEmbedScene) {
       blob = blob.then(
-        (blob2) => import("./data/image-SRS7NOJX.js").then(
+        (blob2) => import("./data/image-XBJAOPJQ.js").then(
           ({ encodePngMetadata }) => encodePngMetadata({
             blob: blob2,
             metadata: serializeAsJSON(elements, appState, files, "local")
@@ -24758,6 +24765,23 @@ var App = class _App extends React43.Component {
     __publicField(this, "lastPointerMoveCoords", null);
     __publicField(this, "lastViewportPosition", { x: 0, y: 0 });
     __publicField(this, "animationFrameHandler", new AnimationFrameHandler());
+    // FORK(board): 虚线流动 —— 全局相位时钟 + 它自己的 rAF 循环。
+    //
+    // 时钟**只存在于渲染层**，绝不写进 element：相位若进元素，每帧都会 bump
+    // 元素 version，宿主的场景同步引擎会把 60fps 的相位当成用户改动疯狂上传。
+    //
+    // 循环仅在「视口内确实有正在流动的元素」时运行（见 syncFlowLoop），
+    // 静止画板零开销；标签页隐藏时 rAF 由浏览器自动挂起，也无需额外处理。
+    __publicField(this, "flowTime", 0);
+    /** AnimationFrameHandler 以对象身份为 key，这里给流动循环一个专属句柄 */
+    __publicField(this, "flowLoopKey", {});
+    __publicField(this, "onFlowFrame", (timestamp) => {
+      if (timestamp - this.flowTime < 1e3 / 30) {
+        return;
+      }
+      this.flowTime = timestamp;
+      this.forceUpdate();
+    });
     __publicField(this, "laserTrails", new LaserTrails(this.animationFrameHandler, this));
     __publicField(this, "eraserTrail", new AnimatedTrail(this.animationFrameHandler, this, {
       streamline: 0.2,
@@ -29507,6 +29531,14 @@ var App = class _App extends React43.Component {
       createRedoAction(this.history, this.store)
     );
   }
+  /** 视口内有元素在流动才跑循环；否则停掉，避免静止画板常驻 CPU */
+  syncFlowLoop() {
+    if (this.visibleElements.some(isElementFlowing)) {
+      this.animationFrameHandler.start(this.flowLoopKey);
+    } else {
+      this.animationFrameHandler.stop(this.flowLoopKey);
+    }
+  }
   onWindowMessage(event) {
     if (event.origin !== "https://player.vimeo.com" && event.origin !== "https://www.youtube.com") {
       return;
@@ -30080,7 +30112,12 @@ var App = class _App extends React43.Component {
                               canvasBackgroundColor: this.state.viewBackgroundColor,
                               embedsValidationStatus: this.embedsValidationStatus,
                               elementsPendingErasure: this.elementsPendingErasure,
-                              pendingFlowchartNodes: this.flowChartCreator.pendingNodes
+                              pendingFlowchartNodes: this.flowChartCreator.pendingNodes,
+                              // FORK(board): 虚线流动的全局时钟。它是 renderConfig
+                              // 的一部分，StaticCanvas 的 areEqual 已经对
+                              // renderConfig 做浅比较 —— 时钟一变就自动放行重绘，
+                              // 无需改动 memo 逻辑本身
+                              flowTime: this.flowTime
                             }
                           }
                         ),
@@ -30250,6 +30287,7 @@ var App = class _App extends React43.Component {
   async componentDidMount() {
     this.unmounted = false;
     this.excalidrawContainerValue.container = this.excalidrawContainerRef.current;
+    this.animationFrameHandler.register(this.flowLoopKey, this.onFlowFrame);
     if (define_import_meta_env_default.MODE === ENV.TEST || define_import_meta_env_default.DEV) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
@@ -30320,6 +30358,7 @@ var App = class _App extends React43.Component {
     }
   }
   componentWillUnmount() {
+    this.animationFrameHandler.stop(this.flowLoopKey);
     window.launchQueue?.setConsumer(() => {
     });
     this.renderer.destroy();
@@ -30463,6 +30502,7 @@ var App = class _App extends React43.Component {
   }
   componentDidUpdate(prevProps, prevState) {
     this.updateEmbeddables();
+    this.syncFlowLoop();
     const elements = this.scene.getElementsIncludingDeleted();
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
     const nonDeletedElementsMap = this.scene.getNonDeletedElementsMap();
@@ -33116,6 +33156,9 @@ export {
   DefaultSidebar,
   DiagramToCodePlugin,
   Excalidraw,
+  FLOW_DEFAULT_SPEED,
+  FLOW_MAX_SPEED,
+  FLOW_MIN_SPEED,
   FONT_FAMILY,
   FooterCenter_default as Footer,
   LiveCollaborationTrigger_default as LiveCollaborationTrigger,
@@ -33130,6 +33173,7 @@ export {
   UserIdleState,
   WelcomeScreen_default as WelcomeScreen,
   bumpVersion,
+  canElementFlow,
   convertToExcalidrawElements,
   defaultLang,
   elementPartiallyOverlapsWithOrContainsBBox,
@@ -33140,6 +33184,8 @@ export {
   exportToSvg2 as exportToSvg,
   getCommonBounds,
   getDataURL,
+  getElementFlow,
+  getFlowMode,
   getFreeDrawSvgPath,
   getLibraryItemsHash,
   getNonDeletedElements,
@@ -33148,6 +33194,7 @@ export {
   getVisibleSceneBounds,
   hashElementsVersion,
   hashString,
+  isElementFlowing,
   isElementInsideBBox,
   isElementLink,
   isInvisiblySmallElement,

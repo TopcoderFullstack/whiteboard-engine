@@ -17,6 +17,12 @@ export interface ExcalidrawElementWithCanvas {
     imageCrop: ExcalidrawImageElement["crop"] | null;
     containingFrameOpacity: number;
     boundTextCanvas: HTMLCanvasElement;
+    /**
+     * FORK(board): 生成这张离屏 canvas 时所用的流动相位。
+     * 缓存失效的自门控开关：不流动的元素恒为 0（两侧永远相等 → 缓存照常复用，
+     * 零额外开销）；流动中的元素每帧不同 → 只有它自己被重新光栅化。
+     */
+    flowPhase: number;
 }
 export declare const DEFAULT_LINK_SIZE = 14;
 export declare const elementWithCanvasCache: WeakMap<ExcalidrawElement, ExcalidrawElementWithCanvas>;

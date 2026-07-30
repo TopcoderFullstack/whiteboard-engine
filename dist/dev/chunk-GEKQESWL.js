@@ -8633,6 +8633,157 @@ var getFlipAdjustedCropPosition = (element, natural = false) => {
   };
 };
 
+// flow.ts
+var FLOW_DEFAULT_SPEED = 40;
+var FLOW_MIN_SPEED = 5;
+var FLOW_MAX_SPEED = 200;
+var DOT_RADIUS_SCALE = 1.6;
+var DOT_MIN_RADIUS = 2;
+var DOT_MIN_SPACING = 18;
+var DOT_SPACING_SCALE = 8;
+var getFlowMode = (element) => {
+  if (!isLinearElement(element)) {
+    return null;
+  }
+  return element.strokeStyle === "solid" ? "dots" : "dash";
+};
+var canElementFlow = (element) => getFlowMode(element) !== null;
+var getElementFlow = (element) => {
+  const flow = element.customData?.flow;
+  if (!flow || flow.enabled !== true) {
+    return null;
+  }
+  const speed = typeof flow.speed === "number" && Number.isFinite(flow.speed) ? flow.speed : FLOW_DEFAULT_SPEED;
+  return { enabled: true, speed };
+};
+var isElementFlowing = (element) => canElementFlow(element) && getElementFlow(element) !== null;
+var getFlowPhase = (element, timeMs) => {
+  if (!canElementFlow(element)) {
+    return 0;
+  }
+  const flow = getElementFlow(element);
+  if (!flow) {
+    return 0;
+  }
+  const phase = timeMs / 1e3 * flow.speed;
+  return phase === 0 ? 0 : phase;
+};
+var getFlowDotMetrics = (strokeWidth) => {
+  const radius = Math.max(DOT_MIN_RADIUS, strokeWidth * DOT_RADIUS_SCALE);
+  return {
+    radius,
+    spacing: Math.max(DOT_MIN_SPACING, radius * DOT_SPACING_SCALE)
+  };
+};
+
+// flow-path.ts
+var BEZIER_STEPS = 16;
+var pathCache = /* @__PURE__ */ new WeakMap();
+var cubicAt = (p0, p1, p2, p3, t) => {
+  const u = 1 - t;
+  return u * u * u * p0 + 3 * u * u * t * p1 + 3 * u * t * t * p2 + t * t * t * p3;
+};
+var buildFlowPath = (shape) => {
+  const ops = getCurvePathOps(shape);
+  if (!ops.length) {
+    return null;
+  }
+  const points = [];
+  let current = null;
+  for (const op of ops) {
+    const d = op.data;
+    if (op.op === "move") {
+      if (points.length > 0) {
+        break;
+      }
+      current = [d[0], d[1]];
+      points.push(current);
+    } else if (op.op === "lineTo") {
+      current = [d[0], d[1]];
+      points.push(current);
+    } else if (op.op === "bcurveTo" && current) {
+      const [x0, y0] = current;
+      const [x1, y1, x2, y2, x3, y3] = d;
+      for (let i = 1; i <= BEZIER_STEPS; i++) {
+        const t = i / BEZIER_STEPS;
+        points.push([
+          cubicAt(x0, x1, x2, x3, t),
+          cubicAt(y0, y1, y2, y3, t)
+        ]);
+      }
+      current = [x3, y3];
+    }
+  }
+  if (points.length < 2) {
+    return null;
+  }
+  const cumulative = [0];
+  let total = 0;
+  for (let i = 1; i < points.length; i++) {
+    const [px, py] = points[i - 1];
+    const [x, y] = points[i];
+    total += Math.hypot(x - px, y - py);
+    cumulative.push(total);
+  }
+  if (total <= 0) {
+    return null;
+  }
+  return { points, cumulative, total };
+};
+var getFlowPath = (shape) => {
+  const cached = pathCache.get(shape);
+  if (cached) {
+    return cached;
+  }
+  const path = buildFlowPath(shape);
+  if (path) {
+    pathCache.set(shape, path);
+  }
+  return path;
+};
+var pointAtDistance = (path, d) => {
+  const { points, cumulative } = path;
+  let lo = 0;
+  let hi = cumulative.length - 1;
+  while (lo < hi) {
+    const mid = lo + hi >> 1;
+    if (cumulative[mid] < d) {
+      lo = mid + 1;
+    } else {
+      hi = mid;
+    }
+  }
+  if (lo === 0) {
+    return points[0];
+  }
+  const segStart = cumulative[lo - 1];
+  const segLen = cumulative[lo] - segStart;
+  const t = segLen > 0 ? (d - segStart) / segLen : 0;
+  const [ax, ay] = points[lo - 1];
+  const [bx, by] = points[lo];
+  return [ax + (bx - ax) * t, ay + (by - ay) * t];
+};
+var drawFlowDots = (context, shape, options) => {
+  const path = getFlowPath(shape);
+  if (!path) {
+    return;
+  }
+  const { radius, spacing } = getFlowDotMetrics(options.strokeWidth);
+  const { total } = path;
+  const count = Math.max(1, Math.round(total / spacing));
+  const step = total / count;
+  context.save();
+  context.fillStyle = options.strokeColor;
+  for (let i = 0; i < count; i++) {
+    const d = ((options.phase + i * step) % total + total) % total;
+    const [x, y] = pointAtDistance(path, d);
+    context.beginPath();
+    context.arc(x, y, radius, 0, Math.PI * 2);
+    context.fill();
+  }
+  context.restore();
+};
+
 // renderer/renderElement.ts
 var IMAGE_INVERT_FILTER = "invert(100%) hue-rotate(180deg) saturate(1.25)";
 var defaultAppState = getDefaultAppState();
@@ -8657,6 +8808,10 @@ var getRenderOpacity = (element, containingFrame, elementsPendingErasure, pendin
   }
   return opacity;
 };
+var flowPhaseOf = (element, renderConfig) => getFlowPhase(
+  element,
+  renderConfig.isExporting ? 0 : renderConfig.flowTime ?? 0
+);
 var cappedElementCanvasSize = (element, elementsMap, zoom) => {
   const AREA_LIMIT = 16777216;
   const WIDTH_HEIGHT_LIMIT = 32767;
@@ -8760,7 +8915,9 @@ var generateElementCanvas = (element, elementsMap, zoom, renderConfig, appState)
     containingFrameOpacity: getContainingFrame(element, elementsMap)?.opacity || 100,
     boundTextCanvas,
     angle: element.angle,
-    imageCrop: isImageElement(element) ? element.crop : null
+    imageCrop: isImageElement(element) ? element.crop : null,
+    // FORK(board): 记下本次光栅化用的虚线相位（缓存失效比对用）
+    flowPhase: flowPhaseOf(element, renderConfig)
   };
 };
 var DEFAULT_LINK_SIZE = 14;
@@ -8804,9 +8961,21 @@ var drawElementOnCanvas = (element, rc, context, renderConfig, appState) => {
     case "line": {
       context.lineJoin = "round";
       context.lineCap = "round";
-      ShapeCache.get(element).forEach((shape) => {
+      const flowPhase = flowPhaseOf(element, renderConfig);
+      const shapes = ShapeCache.get(element);
+      shapes.forEach((shape) => {
+        if (shape.options.strokeLineDash) {
+          shape.options.strokeLineDashOffset = -flowPhase;
+        }
         rc.draw(shape);
       });
+      if (flowPhase !== 0 && getFlowMode(element) === "dots" && shapes[0]) {
+        drawFlowDots(context, shapes[0], {
+          strokeColor: element.strokeColor,
+          strokeWidth: element.strokeWidth,
+          phase: flowPhase
+        });
+      }
       break;
     }
     case "freedraw": {
@@ -8907,7 +9076,8 @@ var generateElementWithCanvas = (element, elementsMap, renderConfig, appState) =
   const boundTextElementVersion = boundTextElement?.version || null;
   const imageCrop = isImageElement(element) ? element.crop : null;
   const containingFrameOpacity = getContainingFrame(element, elementsMap)?.opacity || 100;
-  if (!prevElementWithCanvas || shouldRegenerateBecauseZoom || prevElementWithCanvas.theme !== appState.theme || prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion || prevElementWithCanvas.imageCrop !== imageCrop || prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity || // since we rotate the canvas when copying from cached canvas, we don't
+  const flowPhase = flowPhaseOf(element, renderConfig);
+  if (!prevElementWithCanvas || shouldRegenerateBecauseZoom || prevElementWithCanvas.flowPhase !== flowPhase || prevElementWithCanvas.theme !== appState.theme || prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion || prevElementWithCanvas.imageCrop !== imageCrop || prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity || // since we rotate the canvas when copying from cached canvas, we don't
   // regenerate the cached canvas. But we need to in case of labels which are
   // cached alongside the arrow, and we want the labels to remain unrotated
   // with respect to the arrow.
@@ -24535,7 +24705,7 @@ var parseFileContents = async (blob) => {
   let contents;
   if (blob.type === MIME_TYPES.png) {
     try {
-      return await (await import("./data/image-SRS7NOJX.js")).decodePngMetadata(blob);
+      return await (await import("./data/image-XBJAOPJQ.js")).decodePngMetadata(blob);
     } catch (error) {
       if (error.message === "INVALID") {
         throw new ImageSceneDataError(
@@ -25515,6 +25685,13 @@ export {
   getFrameLikeTitle,
   getElementsOverlappingFrame,
   frameAndChildrenSelectedTogether,
+  FLOW_DEFAULT_SPEED,
+  FLOW_MIN_SPEED,
+  FLOW_MAX_SPEED,
+  getFlowMode,
+  canElementFlow,
+  getElementFlow,
+  isElementFlowing,
   getRenderOpacity,
   renderSelectionElement,
   renderElement,
@@ -25609,4 +25786,4 @@ export {
   getNormalizedZoom,
   getNormalizedGridStep
 };
-//# sourceMappingURL=chunk-CHSOEA7N.js.map
+//# sourceMappingURL=chunk-GEKQESWL.js.map

@@ -34,6 +34,8 @@ export { Stats } from "./components/Stats";
 export { DefaultSidebar } from "./components/DefaultSidebar";
 export { TTDDialog } from "./components/TTDDialog/TTDDialog";
 export { TTDDialogTrigger } from "./components/TTDDialog/TTDDialogTrigger";
+export { canElementFlow, getElementFlow, getFlowMode, isElementFlowing, FLOW_DEFAULT_SPEED, FLOW_MIN_SPEED, FLOW_MAX_SPEED, } from "./flow";
+export type { ElementFlow, FlowMode } from "./flow";
 export { normalizeLink } from "./data/url";
 export { zoomToFitBounds } from "./actions/actionCanvas";
 export { convertToExcalidrawElements } from "./data/transform";

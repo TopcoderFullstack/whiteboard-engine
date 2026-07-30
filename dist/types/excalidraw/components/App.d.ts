@@ -95,6 +95,12 @@ declare class App extends React.Component<AppProps, AppState> {
         y: number;
     };
     animationFrameHandler: AnimationFrameHandler;
+    flowTime: number;
+    /** AnimationFrameHandler 以对象身份为 key，这里给流动循环一个专属句柄 */
+    private flowLoopKey;
+    private onFlowFrame;
+    /** 视口内有元素在流动才跑循环；否则停掉，避免静止画板常驻 CPU */
+    private syncFlowLoop;
     laserTrails: LaserTrails;
     eraserTrail: AnimatedTrail;
     onChangeEmitter: Emitter<[elements: readonly ExcalidrawElement[], appState: AppState, files: BinaryFiles]>;
