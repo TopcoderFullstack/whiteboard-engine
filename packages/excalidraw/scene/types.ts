@@ -35,6 +35,11 @@ export type StaticCanvasRenderConfig = {
   embedsValidationStatus: EmbedsValidationStatus;
   elementsPendingErasure: ElementsPendingErasure;
   pendingFlowchartNodes: PendingExcalidrawElements | null;
+  /**
+   * FORK(board): 虚线流动的全局时钟（ms，取自 rAF timestamp）。
+   * 缺省 = 0 = 静止帧；导出路径恒按 0 处理，保证渲染确定性。
+   */
+  flowTime?: number;
 };
 
 export type SVGRenderConfig = {

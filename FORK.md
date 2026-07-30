@@ -33,6 +33,7 @@
 | 14 | `components/App.tsx` `updateDOMRect` | 尺寸变化时在同一 setState 内按**容器原点位移**补偿 scrollX/scrollY（随缩放换算；纯移动不补偿；首测 0 尺寸跳过） | 内容钉死屏幕坐标：上游锚定左上在浏览器整窗形态天然"没动"，宿主桌面窗口原点会动（最大化动画/左上边缘拖拽），原点位移补偿让缩放期间内容在屏幕上纹丝不动 | 低：单函数小改 |
 | 15 | `components/canvases/StaticCanvas.tsx` + `InteractiveCanvas.tsx` | 重绘从 useEffect（paint 后）改为 useLayoutEffect（paint 前），几何指纹（尺寸/偏移/scale）变化的提交绕过 rAF 节流同步落画 | 尺寸变化的提交若延后重绘会先画一帧"旧画面在新位置"（窗口缩放结束的跳变）；普通内容更新仍走节流不伤性能 | 中：上游改画布组件时需保留 layoutEffect + 指纹旁路 |
 | 16 | `scene/Scene.ts` `replaceAllElements` | 把 `validateIndicesThrottled` 挪到 `syncInvalidIndices` 之后（上游顺序相反），校验修复后的 `this.elements`（标 `FORK(board)` 注释） | 上游先校验后修复：复制/粘贴提交的克隆体经 deepCopyElement 原样复制源的 fractional index，索引在 syncInvalidIndices 才被重排；先校验会在修复前看到瞬时冲突而误报（dev 下 shouldThrow 抛错中断该次复制），报「Fractional indices invariant has been compromised」 | 低：单函数两行顺序调整，上游改 replaceAllElements 时保持"先修复后校验" |
+| 17 | `flow.ts` `flow-path.ts`（新增）+ `index.tsx`（导出）+ `scene/types.ts`（`flowTime?`）+ `renderer/renderElement.ts`（相位应用 + 缓存自门控）+ `components/App.tsx`（rAF 循环 + `flowTime` 进 renderConfig） | 流动：线性元素沿路径表达数据流向，按描边样式分两种视觉——dashed/dotted 走 **dash 模式**（虚线本身行进 marching ants）、solid 走 **dots 模式**（线不变，叠一串小圆球依次从起点驶向终点，沿缓存 Drawable 的主曲线按弧长采样）。开关与流速存 `element.customData.flow`，动画时钟只存在于渲染层 | 表达数据流向；宿主属性面板提供开关 + 流速滑块（见宿主 board-props.tsx） | 低：主体为两个新文件，其余四处均是「加字段 / 加条件 / 加生命周期钩子」的增量插入，未改写上游既有逻辑分支 |
 
 ## 构建与发布 runbook
 

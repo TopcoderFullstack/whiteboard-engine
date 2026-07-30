@@ -64,6 +64,9 @@ import { isRightAngleRads } from "@excalidraw/math";
 import { getCornerRadius } from "../shapes";
 import { getUncroppedImageElement } from "../element/cropElement";
 import { getLineHeightInPx } from "../element/textMeasurements";
+// FORK(board): 流动
+import { getFlowMode, getFlowPhase } from "../flow";
+import { drawFlowDots } from "../flow-path";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -144,7 +147,27 @@ export interface ExcalidrawElementWithCanvas {
   imageCrop: ExcalidrawImageElement["crop"] | null;
   containingFrameOpacity: number;
   boundTextCanvas: HTMLCanvasElement;
+  /**
+   * FORK(board): 生成这张离屏 canvas 时所用的流动相位。
+   * 缓存失效的自门控开关：不流动的元素恒为 0（两侧永远相等 → 缓存照常复用，
+   * 零额外开销）；流动中的元素每帧不同 → 只有它自己被重新光栅化。
+   */
+  flowPhase: number;
 }
+
+/**
+ * FORK(board): 该帧下元素的流动相位（已行进距离，px）。
+ * 导出恒按 0 计算 —— 导出必须是确定性的，否则同一场景每次导出的
+ * 缩略图/PNG 都会因相位不同而产生字节差异。
+ */
+const flowPhaseOf = (
+  element: NonDeletedExcalidrawElement,
+  renderConfig: StaticCanvasRenderConfig,
+): number =>
+  getFlowPhase(
+    element,
+    renderConfig.isExporting ? 0 : renderConfig.flowTime ?? 0,
+  );
 
 const cappedElementCanvasSize = (
   element: NonDeletedExcalidrawElement,
@@ -340,6 +363,8 @@ const generateElementCanvas = (
     boundTextCanvas,
     angle: element.angle,
     imageCrop: isImageElement(element) ? element.crop : null,
+    // FORK(board): 记下本次光栅化用的虚线相位（缓存失效比对用）
+    flowPhase: flowPhaseOf(element, renderConfig),
   };
 };
 
@@ -403,9 +428,31 @@ const drawElementOnCanvas = (
       context.lineJoin = "round";
       context.lineCap = "round";
 
-      ShapeCache.get(element)!.forEach((shape) => {
+      // FORK(board): 流动。dash 模式只改缓存 Drawable 的 dash 相位，几何不重
+      // 生成；只对带 dash 的 shape 赋值 —— arrowhead 在 Shape.ts 里被显式
+      // `delete options.strokeLineDash`（恒为实线），所以箭头不会跟着虚化。
+      // 不流动时 flowPhase 为 0，赋 0 同时也复位了此前残留的相位。
+      // 负号：lineDashOffset 递减 = 图案沿路径正方向前移。
+      const flowPhase = flowPhaseOf(element, renderConfig);
+      const shapes = ShapeCache.get(element)!;
+
+      shapes.forEach((shape) => {
+        if (shape.options.strokeLineDash) {
+          shape.options.strokeLineDashOffset = -flowPhase;
+        }
         rc.draw(shape);
       });
+
+      // dots 模式：实线没有 dash 可动，改在画完线之后叠一串小圆球。
+      // 采样对象是 shapes[0]（主曲线，Shape.ts 保证它恒在首位），
+      // 所以圆球严格贴着实际画出来的那条线走，包括 roughness 抖动。
+      if (flowPhase !== 0 && getFlowMode(element) === "dots" && shapes[0]) {
+        drawFlowDots(context, shapes[0], {
+          strokeColor: element.strokeColor,
+          strokeWidth: element.strokeWidth,
+          phase: flowPhase,
+        });
+      }
       break;
     }
     case "freedraw": {
@@ -546,9 +593,15 @@ const generateElementWithCanvas = (
   const containingFrameOpacity =
     getContainingFrame(element, elementsMap)?.opacity || 100;
 
+  // FORK(board): 虚线流动 —— 相位变了就必须重新光栅化这张离屏 canvas，
+  // 否则静态层每帧 blit 的还是同一张图，动画根本看不见。
+  // 不流动的元素两侧恒为 0，该条件永不命中，缓存行为与上游完全一致。
+  const flowPhase = flowPhaseOf(element, renderConfig);
+
   if (
     !prevElementWithCanvas ||
     shouldRegenerateBecauseZoom ||
+    prevElementWithCanvas.flowPhase !== flowPhase ||
     prevElementWithCanvas.theme !== appState.theme ||
     prevElementWithCanvas.boundTextElementVersion !== boundTextElementVersion ||
     prevElementWithCanvas.imageCrop !== imageCrop ||

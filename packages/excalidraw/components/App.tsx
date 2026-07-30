@@ -414,6 +414,8 @@ import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import FollowMode from "./FollowMode/FollowMode";
 import { Store, CaptureUpdateAction } from "../store";
 import { AnimationFrameHandler } from "../animation-frame-handler";
+// FORK(board): 虚线流动
+import { isElementFlowing } from "../flow";
 import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
@@ -614,6 +616,40 @@ class App extends React.Component<AppProps, AppState> {
   lastViewportPosition = { x: 0, y: 0 };
 
   animationFrameHandler = new AnimationFrameHandler();
+
+  // FORK(board): 虚线流动 —— 全局相位时钟 + 它自己的 rAF 循环。
+  //
+  // 时钟**只存在于渲染层**，绝不写进 element：相位若进元素，每帧都会 bump
+  // 元素 version，宿主的场景同步引擎会把 60fps 的相位当成用户改动疯狂上传。
+  //
+  // 循环仅在「视口内确实有正在流动的元素」时运行（见 syncFlowLoop），
+  // 静止画板零开销；标签页隐藏时 rAF 由浏览器自动挂起，也无需额外处理。
+  flowTime = 0;
+
+  /** AnimationFrameHandler 以对象身份为 key，这里给流动循环一个专属句柄 */
+  private flowLoopKey = {};
+
+  private onFlowFrame = (timestamp: number) => {
+    // 节流到 ~30fps：流动是缓慢漂移，30fps 与 60fps 肉眼无差，
+    // 但能把 App 的重渲染次数直接减半
+    if (timestamp - this.flowTime < 1000 / 30) {
+      return;
+    }
+    this.flowTime = timestamp;
+    // 不进 setState —— 相位不属于 AppState（进了就要动 appState.ts 的
+    // 持久化白名单与穷尽性检查）。forceUpdate 重建 renderConfig 即可，
+    // StaticCanvas 的 areEqual 会因 renderConfig 变化放行重绘。
+    this.forceUpdate();
+  };
+
+  /** 视口内有元素在流动才跑循环；否则停掉，避免静止画板常驻 CPU */
+  private syncFlowLoop() {
+    if (this.visibleElements.some(isElementFlowing)) {
+      this.animationFrameHandler.start(this.flowLoopKey);
+    } else {
+      this.animationFrameHandler.stop(this.flowLoopKey);
+    }
+  }
 
   laserTrails = new LaserTrails(this.animationFrameHandler, this);
   eraserTrail = new AnimatedTrail(this.animationFrameHandler, this, {
@@ -1765,6 +1801,11 @@ class App extends React.Component<AppProps, AppState> {
                             elementsPendingErasure: this.elementsPendingErasure,
                             pendingFlowchartNodes:
                               this.flowChartCreator.pendingNodes,
+                            // FORK(board): 虚线流动的全局时钟。它是 renderConfig
+                            // 的一部分，StaticCanvas 的 areEqual 已经对
+                            // renderConfig 做浅比较 —— 时钟一变就自动放行重绘，
+                            // 无需改动 memo 逻辑本身
+                            flowTime: this.flowTime,
                           }}
                         />
                         {this.state.newElement && (
@@ -2454,6 +2495,9 @@ class App extends React.Component<AppProps, AppState> {
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
 
+    // FORK(board): 注册虚线流动循环（是否真正启动交给 syncFlowLoop 按内容判定）
+    this.animationFrameHandler.register(this.flowLoopKey, this.onFlowFrame);
+
     if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
       const setState = this.setState.bind(this);
       Object.defineProperties(window.h, {
@@ -2535,6 +2579,8 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public componentWillUnmount() {
+    // FORK(board): 停掉虚线流动循环，否则卸载后 rAF 仍持有 this 造成泄漏
+    this.animationFrameHandler.stop(this.flowLoopKey);
     (window as any).launchQueue?.setConsumer(() => {});
     this.renderer.destroy();
     this.scene.destroy();
@@ -2720,6 +2766,10 @@ class App extends React.Component<AppProps, AppState> {
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
     this.updateEmbeddables();
+    // FORK(board): 每次渲染后按最新的 visibleElements 决定流动循环起停。
+    // 循环自身走 forceUpdate 会再次回到这里，命中 start 的幂等分支后无副作用；
+    // 一旦流动元素被删除/关闭/移出视口，这里就把循环停掉。
+    this.syncFlowLoop();
     const elements = this.scene.getElementsIncludingDeleted();
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
     const nonDeletedElementsMap = this.scene.getNonDeletedElementsMap();
